@@ -7,16 +7,38 @@
 
 import Foundation
 
+enum APIError: Error {
+    case invalidURL
+    case invalidResponse
+    case invalidData
+}
+
+enum Keys {
+    static let baseUrl = "https://jsonplaceholder.typicode.com/users"
+}
+
 class APIService {
-    private let baseURL = "https://jsonplaceholder.typicode.com"
     
     func getUsers() async throws -> [User] {
-        guard let url = URL(string: "\(baseURL)/users") else {
-            throw URLError(.badURL)
+        return try await fetchData(from: "\(Keys.baseUrl)/users")
+    }
+    
+    func fetchData<T: Decodable>(from urlString: String) async throws -> T {
+        guard let url = URL(string: urlString) else {
+            throw APIError.invalidURL
         }
         
-        let (data, _) = try await URLSession.shared.data(from: url)
-        let users = try JSONDecoder().decode([User].self, from: data)
-        return users
+        let (data, response) = try await URLSession.shared.data(from: url)
+        
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            throw APIError.invalidResponse
+        }
+        
+        do {
+            return try JSONDecoder().decode(T.self, from: data)
+        } catch {
+            throw APIError.invalidData
+        }
+        
     }
 }

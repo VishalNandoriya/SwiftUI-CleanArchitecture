@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-@MainActor
 class UserListViewModel: ObservableObject {
     @Published var users: [User] = []
     @Published var isLoading: Bool = false

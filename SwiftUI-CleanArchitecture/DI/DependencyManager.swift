@@ -12,7 +12,7 @@ class DependencyManager {
     
     private init() {}
     
-    @MainActor func provideUserListViewModel() -> UserListViewModel {
+     func provideUserListViewModel() -> UserListViewModel {
         let apiService = APIService()
         let userRepository = DefaultUserRepository(apiService: apiService)
         let fetchUsersUseCase = DefaultFetchUsersUseCase(userRepository: userRepository)
